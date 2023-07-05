@@ -1,10 +1,10 @@
 from flask import Flask
 
-app = Flask(__name__)
+server = Flask(__name__)
 
-@app.route('/')
+@server.route('/')
 def home():
     return '<p>Worked!</p>'
 
 if __name__ == '__main__':
-    app.run()
+    server.run()
