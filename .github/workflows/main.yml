@@ -1,0 +1,53 @@
+name: Build and Deploy
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14
+
+      - name: Install dependencies
+        run: |
+          cd client
+          npm ci
+
+      - name: Build Nuxt app
+        run: |
+          cd client
+          npm run build
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.0
+
+      - name: Install PHP dependencies
+        run: composer install
+
+      - name: Copy environment file
+        run: cp .env.example .env
+
+      - name: Generate application key
+        run: php artisan key:generate
+
+      - name: Run migrations
+        run: php artisan migrate
+
+      - name: Start Laravel server
+        run: php artisan serve --host=localhost --port=8000 &
+
+      - name: Start Nuxt server
+        run: |
+          cd client
+          npm run start
+
